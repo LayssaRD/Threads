@@ -1,0 +1,144 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1310" height="1940" viewBox="0 0 1310 1940" font-family="Segoe UI, Arial, Helvetica, sans-serif">
+
+<defs>
+  <marker id="open" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="11" markerHeight="11" orient="auto-start-reverse" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L11,6 L1,11" fill="none" stroke="#1f2328" stroke-width="1.6"/>
+  </marker>
+  <marker id="fill" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,1 L12,6 L0,11 z" fill="#1f2328"/>
+  </marker>
+  <marker id="fillred" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,1 L12,6 L0,11 z" fill="#b42318"/>
+  </marker>
+</defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="655.0" y="41.7" font-size="22" text-anchor="middle" font-weight="bold" fill="#1f2328">Diagrama de Atividades — Problema das Roletas (Exercício 04a)</text>
+<text x="655.0" y="64.9" font-size="14" text-anchor="middle" font-weight="normal" fill="#57606a" font-style="italic">Roletas.java</text>
+<rect x="10" y="84" width="1290" height="1836" fill="none" stroke="#1f2328" stroke-width="1.6"/>
+<rect x="10" y="84" width="420" height="44" fill="#eef0f3" stroke="#1f2328" stroke-width="1.6"/>
+<text x="220.0" y="111.2" font-size="15" text-anchor="middle" font-weight="bold" fill="#1f2328">main (thread principal)</text>
+<line x1="10" y1="84" x2="10" y2="1920" stroke="#1f2328" stroke-width="1.6"/>
+<rect x="430" y="84" width="390" height="44" fill="#eef0f3" stroke="#1f2328" stroke-width="1.6"/>
+<text x="625.0" y="111.2" font-size="15" text-anchor="middle" font-weight="bold" fill="#1f2328">Roleta rₖ  (thread, ×N)</text>
+<line x1="430" y1="84" x2="430" y2="1920" stroke="#1f2328" stroke-width="1.6"/>
+<rect x="820" y="84" width="480" height="44" fill="#eef0f3" stroke="#1f2328" stroke-width="1.6"/>
+<text x="1060.0" y="111.2" font-size="15" text-anchor="middle" font-weight="bold" fill="#1f2328">ContadorCentral  (monitor)</text>
+<line x1="820" y1="84" x2="820" y2="1920" stroke="#1f2328" stroke-width="1.6"/>
+<circle cx="220" cy="160" r="12" fill="#1f2328"/>
+<rect x="75.0" y="209.0" width="290" height="72" rx="16" fill="#fdf6d8" stroke="#1f2328" stroke-width="1.6"/>
+<text x="220.0" y="231.7" font-size="14" text-anchor="middle" font-weight="normal" fill="#1f2328">Ler parâmetros:</text>
+<text x="220.0" y="249.9" font-size="14" text-anchor="middle" font-weight="normal" fill="#1f2328">qtdRoletas (padrão 4)</text>
+<text x="220.0" y="268.1" font-size="14" text-anchor="middle" font-weight="normal" fill="#1f2328">giros (padrão 1.000.000)</text>
+<rect x="75.0" y="313.0" width="290" height="54" rx="16" fill="#fdf6d8" stroke="#1f2328" stroke-width="1.6"/>
+<text x="220.0" y="335.8" font-size="14" text-anchor="middle" font-weight="normal" fill="#1f2328">Criar ContadorCentral</text>
+<text x="220.0" y="354.0" font-size="14" text-anchor="middle" font-weight="normal" fill="#1f2328">(numPessoas = 0)</text>
+<rect x="75.0" y="404.0" width="290" height="72" rx="16" fill="#fdf6d8" stroke="#1f2328" stroke-width="1.6"/>
+<text x="220.0" y="426.7" font-size="14" text-anchor="middle" font-weight="normal" fill="#1f2328">Criar N roletas:</text>
+<text x="220.0" y="444.9" font-size="14" text-anchor="middle" font-weight="normal" fill="#1f2328">rₖ com incr = k</text>
+<text x="220.0" y="463.1" font-size="14" text-anchor="middle" font-weight="normal" fill="#1f2328">esperado += k × giros</text>
+<rect x="75.0" y="508.0" width="290" height="54" rx="16" fill="#fdf6d8" stroke="#1f2328" stroke-width="1.6"/>
+<text x="220.0" y="530.8" font-size="14" text-anchor="middle" font-weight="normal" fill="#1f2328">Iniciar as N threads</text>
+<text x="220.0" y="549.0" font-size="14" text-anchor="middle" font-weight="normal" fill="#1f2328">(start)</text>
+<polyline points="220.0,172.0 220.0,209.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<polyline points="220.0,281.0 220.0,313.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<polyline points="220.0,367.0 220.0,404.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<polyline points="220.0,476.0 220.0,508.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<polyline points="220.0,562.0 220.0,597.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<rect x="130" y="597" width="630" height="8" rx="2" fill="#1f2328"/>
+<polyline points="540.0,605.0 540.0,646.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<text x="546.0" y="628.2" font-size="12" text-anchor="start" font-weight="normal" fill="#57606a">r₁</text>
+<polyline points="610.0,605.0 610.0,646.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<text x="616.0" y="628.2" font-size="12" text-anchor="start" font-weight="normal" fill="#57606a">r₂</text>
+<polyline points="730.0,605.0 730.0,646.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<text x="736.0" y="628.2" font-size="12" text-anchor="start" font-weight="normal" fill="#57606a">rₙ</text>
+<text x="670.0" y="629.6" font-size="16" text-anchor="middle" font-weight="normal" fill="#57606a">…</text>
+<rect x="445" y="648" width="845" height="832" rx="18" fill="none" stroke="#57606a" stroke-width="1.6" stroke-dasharray="9 6"/>
+<text x="461.0" y="671.0" font-size="13" text-anchor="start" font-weight="normal" fill="#57606a" font-style="italic">«parallel»  para cada roleta rₖ, k = 1..N  (uma thread cada)</text>
+<path d="M870,682 L1251,682 L1265,696 L1265,756 L870,756 Z" fill="#fff9c4" stroke="#1f2328" stroke-width="1.3"/>
+<path d="M1251,682 L1251,696 L1265,696" fill="none" stroke="#1f2328" stroke-width="1.3"/>
+<text x="882.0" y="706.6" font-size="13" text-anchor="start" font-weight="normal" fill="#1f2328">somar() é synchronized: exclusão</text>
+<text x="882.0" y="723.5" font-size="13" text-anchor="start" font-weight="normal" fill="#1f2328">mútua — só uma roleta por vez</text>
+<text x="882.0" y="740.4" font-size="13" text-anchor="start" font-weight="normal" fill="#1f2328">altera numPessoas.</text>
+<rect x="535.0" y="695.0" width="180" height="40" rx="16" fill="#fdf6d8" stroke="#1f2328" stroke-width="1.6"/>
+<text x="625.0" y="719.9" font-size="14" text-anchor="middle" font-weight="normal" fill="#1f2328">i = 0</text>
+<polyline points="625.0,676.0 625.0,695.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<path d="M625,772 L643,790 L625,808 L607,790 Z" fill="#ffffff" stroke="#1f2328" stroke-width="1.6"/>
+<polyline points="625.0,735.0 625.0,772.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<path d="M625,837 L643,855 L625,873 L607,855 Z" fill="#ffffff" stroke="#1f2328" stroke-width="1.6"/>
+<polyline points="625.0,808.0 625.0,837.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<text x="651.0" y="872.5" font-size="13" text-anchor="start" font-weight="normal" fill="#57606a">i &lt; giros ?</text>
+<rect x="495.0" y="913.0" width="260" height="54" rx="16" fill="#fdf6d8" stroke="#1f2328" stroke-width="1.6"/>
+<text x="625.0" y="935.8" font-size="14" text-anchor="middle" font-weight="normal" fill="#1f2328">totPessoas += incr</text>
+<text x="625.0" y="954.0" font-size="14" text-anchor="middle" font-weight="normal" fill="#1f2328">(contador local)</text>
+<polyline points="625.0,873.0 625.0,913.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<text x="633.0" y="897.5" font-size="13" text-anchor="start" font-weight="normal" fill="#57606a">[sim]</text>
+<rect x="495.0" y="998.0" width="260" height="54" rx="16" fill="#fdf6d8" stroke="#1f2328" stroke-width="1.6"/>
+<text x="625.0" y="1020.8" font-size="14" text-anchor="middle" font-weight="normal" fill="#1f2328">Chamar</text>
+<text x="625.0" y="1039.0" font-size="14" text-anchor="middle" font-weight="normal" fill="#1f2328">contador.somar(incr)</text>
+<polyline points="625.0,967.0 625.0,998.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<polyline points="755.0,1025.0 1030.0,1025.0 1030.0,1052.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<path d="M1030,1052 L1048,1070 L1030,1088 L1012,1070 Z" fill="#ffffff" stroke="#1f2328" stroke-width="1.6"/>
+<path d="M1030,1122 L1048,1140 L1030,1158 L1012,1140 Z" fill="#ffffff" stroke="#1f2328" stroke-width="1.6"/>
+<polyline points="1030.0,1088.0 1030.0,1122.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<text x="1004.0" y="1136.1" font-size="13" text-anchor="end" font-weight="normal" fill="#57606a">monitor</text>
+<text x="1004.0" y="1153.0" font-size="13" text-anchor="end" font-weight="normal" fill="#57606a">livre ?</text>
+<rect x="1120.0" y="1113.0" width="140" height="54" rx="16" fill="#fdf6d8" stroke="#1f2328" stroke-width="1.6"/>
+<text x="1190.0" y="1135.8" font-size="14" text-anchor="middle" font-weight="normal" fill="#1f2328">Aguardar</text>
+<text x="1190.0" y="1154.0" font-size="14" text-anchor="middle" font-weight="normal" fill="#1f2328">(bloqueada)</text>
+<polyline points="1048.0,1140.0 1120.0,1140.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<text x="1054.0" y="1134.5" font-size="13" text-anchor="start" font-weight="normal" fill="#57606a">[não]</text>
+<polyline points="1190.0,1113.0 1190.0,1070.0 1048.0,1070.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<rect x="900.0" y="1193.0" width="260" height="54" rx="16" fill="#fdf6d8" stroke="#1f2328" stroke-width="1.6"/>
+<text x="1030.0" y="1215.8" font-size="14" text-anchor="middle" font-weight="normal" fill="#1f2328">Adquirir lock</text>
+<text x="1030.0" y="1234.0" font-size="14" text-anchor="middle" font-weight="normal" fill="#1f2328">(entra em somar)</text>
+<polyline points="1030.0,1158.0 1030.0,1193.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<text x="1038.0" y="1180.5" font-size="13" text-anchor="start" font-weight="normal" fill="#57606a">[sim]</text>
+<rect x="900.0" y="1282.0" width="260" height="46" rx="16" fill="#fdf6d8" stroke="#1f2328" stroke-width="1.6"/>
+<text x="1030.0" y="1309.9" font-size="14" text-anchor="middle" font-weight="normal" fill="#1f2328">numPessoas += incr</text>
+<polyline points="1030.0,1247.0 1030.0,1282.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<rect x="900.0" y="1363.0" width="260" height="54" rx="16" fill="#fdf6d8" stroke="#1f2328" stroke-width="1.6"/>
+<text x="1030.0" y="1385.8" font-size="14" text-anchor="middle" font-weight="normal" fill="#1f2328">Liberar lock</text>
+<text x="1030.0" y="1404.0" font-size="14" text-anchor="middle" font-weight="normal" fill="#1f2328">(sai de somar)</text>
+<polyline points="1030.0,1328.0 1030.0,1363.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<polyline points="1160.0,1390.0 1270.0,1390.0 1270.0,790.0 643.0,790.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<text x="1262.0" y="774.5" font-size="13" text-anchor="end" font-weight="normal" fill="#57606a">i++</text>
+<polyline points="607.0,855.0 480.0,855.0 480.0,1440.0 515.0,1440.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<text x="601.0" y="849.5" font-size="13" text-anchor="end" font-weight="normal" fill="#57606a">[não]</text>
+<rect x="515.0" y="1420.0" width="220" height="40" rx="16" fill="#fdf6d8" stroke="#1f2328" stroke-width="1.6"/>
+<text x="625.0" y="1444.9" font-size="14" text-anchor="middle" font-weight="normal" fill="#1f2328">Thread rₖ termina</text>
+<polyline points="625.0,1460.0 625.0,1480.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<polyline points="540.0,1480.0 540.0,1522.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<polyline points="610.0,1480.0 610.0,1522.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<polyline points="730.0,1480.0 730.0,1522.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<text x="670.0" y="1505.6" font-size="16" text-anchor="middle" font-weight="normal" fill="#57606a">…</text>
+<rect x="130" y="1522" width="630" height="8" rx="2" fill="#1f2328"/>
+<text x="640.0" y="1552.2" font-size="12" text-anchor="start" font-weight="normal" fill="#57606a" font-style="italic">join: espera as N threads</text>
+<rect x="75.0" y="1568.0" width="290" height="54" rx="16" fill="#fdf6d8" stroke="#1f2328" stroke-width="1.6"/>
+<text x="220.0" y="1590.8" font-size="14" text-anchor="middle" font-weight="normal" fill="#1f2328">Somar totPessoas</text>
+<text x="220.0" y="1609.0" font-size="14" text-anchor="middle" font-weight="normal" fill="#1f2328">de cada roleta</text>
+<polyline points="220.0,1530.0 220.0,1568.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<rect x="75.0" y="1653.0" width="290" height="54" rx="16" fill="#fdf6d8" stroke="#1f2328" stroke-width="1.6"/>
+<text x="220.0" y="1675.8" font-size="14" text-anchor="middle" font-weight="normal" fill="#1f2328">Ler numPessoas</text>
+<text x="220.0" y="1694.0" font-size="14" text-anchor="middle" font-weight="normal" fill="#1f2328">do ContadorCentral</text>
+<polyline points="220.0,1622.0 220.0,1653.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<path d="M220,1727 L238,1745 L220,1763 L202,1745 Z" fill="#ffffff" stroke="#1f2328" stroke-width="1.6"/>
+<polyline points="220.0,1707.0 220.0,1727.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<text x="246.0" y="1739.5" font-size="13" text-anchor="start" font-weight="normal" fill="#57606a">numPessoas == esperado ?</text>
+<rect x="20.0" y="1793.0" width="180" height="54" rx="16" fill="#fdf6d8" stroke="#1f2328" stroke-width="1.6"/>
+<text x="110.0" y="1816.1" font-size="13" text-anchor="middle" font-weight="normal" fill="#1f2328">Exibir “OK:</text>
+<text x="110.0" y="1833.0" font-size="13" text-anchor="middle" font-weight="normal" fill="#1f2328">contagem correta!”</text>
+<rect x="240.0" y="1793.0" width="180" height="54" rx="16" fill="#fdf6d8" stroke="#1f2328" stroke-width="1.6"/>
+<text x="330.0" y="1816.1" font-size="13" text-anchor="middle" font-weight="normal" fill="#1f2328">Exibir “ERRO: perda</text>
+<text x="330.0" y="1833.0" font-size="13" text-anchor="middle" font-weight="normal" fill="#1f2328">de atualizações!”</text>
+<polyline points="202.0,1745.0 110.0,1745.0 110.0,1793.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<text x="118.0" y="1769.5" font-size="13" text-anchor="start" font-weight="normal" fill="#57606a">[sim]</text>
+<polyline points="238.0,1745.0 330.0,1745.0 330.0,1793.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<text x="338.0" y="1769.5" font-size="13" text-anchor="start" font-weight="normal" fill="#57606a">[não]</text>
+<circle cx="220" cy="1885" r="15" fill="#ffffff" stroke="#1f2328" stroke-width="1.8"/>
+<circle cx="220" cy="1885" r="9" fill="#1f2328"/>
+<polyline points="110.0,1847.0 110.0,1885.0 204.0,1885.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<polyline points="330.0,1847.0 330.0,1885.0 236.0,1885.0" fill="none" stroke="#1f2328" stroke-width="1.6" marker-end="url(#open)" stroke-linejoin="round"/>
+<text x="220.0" y="1037.6" font-size="13" text-anchor="middle" font-weight="normal" fill="#57606a" font-style="italic">main fica bloqueada em</text>
+<text x="220.0" y="1054.5" font-size="13" text-anchor="middle" font-weight="normal" fill="#57606a" font-style="italic">t.join() até as N threads</text>
+<text x="220.0" y="1071.4" font-size="13" text-anchor="middle" font-weight="normal" fill="#57606a" font-style="italic">terminarem</text>
+</svg>

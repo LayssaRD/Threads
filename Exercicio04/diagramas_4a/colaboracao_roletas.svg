@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="730" viewBox="0 0 1180 730" font-family="Segoe UI, Arial, Helvetica, sans-serif">
+
+<defs>
+  <marker id="open" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="11" markerHeight="11" orient="auto-start-reverse" markerUnits="userSpaceOnUse">
+    <path d="M1,1 L11,6 L1,11" fill="none" stroke="#1f2328" stroke-width="1.6"/>
+  </marker>
+  <marker id="fill" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,1 L12,6 L0,11 z" fill="#1f2328"/>
+  </marker>
+  <marker id="fillred" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,1 L12,6 L0,11 z" fill="#b42318"/>
+  </marker>
+</defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="590.0" y="41.7" font-size="22" text-anchor="middle" font-weight="bold" fill="#1f2328">Diagrama de Colaboração — Problema das Roletas (Exercício 04a)</text>
+<text x="590.0" y="64.9" font-size="14" text-anchor="middle" font-weight="normal" fill="#57606a" font-style="italic">Roletas.java · N roletas (threads) somando num contador central compartilhado</text>
+<polyline points="360.0,170.0 770.0,170.0" fill="none" stroke="#1f2328" stroke-width="1.6" stroke-linejoin="round"/>
+<line x1="549.0" y1="157.0" x2="581.0" y2="157.0" stroke="#1f2328" stroke-width="1.6" marker-end="url(#fill)"/>
+<text x="565.0" y="122.2" font-size="13" text-anchor="middle" font-weight="normal" fill="#1f2328">2*[k=1..N]: new Roleta(incr = k, giros, contador)</text>
+<text x="565.0" y="139.1" font-size="13" text-anchor="middle" font-weight="normal" fill="#1f2328">3*[k]: start()</text>
+<line x1="549.0" y1="183.0" x2="581.0" y2="183.0" stroke="#1f2328" stroke-width="1.6" marker-end="url(#fill)"/>
+<text x="565.0" y="210.0" font-size="13" text-anchor="middle" font-weight="normal" fill="#1f2328">4*[k]: join()</text>
+<text x="565.0" y="226.9" font-size="13" text-anchor="middle" font-weight="normal" fill="#1f2328">5*[k]: ler totPessoas</text>
+<polyline points="240.0,198.0 510.0,470.0" fill="none" stroke="#1f2328" stroke-width="1.6" stroke-linejoin="round"/>
+<line x1="354.5" y1="331.8" x2="377.0" y2="354.5" stroke="#1f2328" stroke-width="1.6" marker-end="url(#fill)"/>
+<text x="355.8" y="361.0" font-size="13" text-anchor="end" font-weight="normal" fill="#1f2328">1: new ContadorCentral()</text>
+<text x="355.8" y="377.9" font-size="13" text-anchor="end" font-weight="normal" fill="#1f2328">6: ler numPessoas</text>
+<polyline points="900.0,214.0 630.0,470.0" fill="none" stroke="#1f2328" stroke-width="1.6" stroke-linejoin="round"/>
+<line x1="785.6" y1="340.4" x2="762.3" y2="362.4" stroke="#1f2328" stroke-width="1.6" marker-end="url(#fill)"/>
+<text x="783.6" y="370.0" font-size="13" text-anchor="start" font-weight="normal" fill="#1f2328">3.2*[i=1..giros]: somar(incr)</text>
+<text x="783.6" y="386.9" font-size="13" text-anchor="start" font-weight="normal" fill="#1f2328">{synchronized}</text>
+<path d="M1046,164 L1080,164 L1080,192 L1048,192" fill="none" stroke="#1f2328" stroke-width="1.5" marker-end="url(#fill)"/>
+<text x="1006.0" y="244.1" font-size="13" text-anchor="start" font-weight="normal" fill="#1f2328">3.1*[i=1..giros]:</text>
+<text x="1006.0" y="261.0" font-size="13" text-anchor="start" font-weight="normal" fill="#1f2328">totPessoas += incr</text>
+<path d="M120,156 L86,156 L86,184 L118,184" fill="none" stroke="#1f2328" stroke-width="1.5" marker-end="url(#fill)"/>
+<text x="40.0" y="228.1" font-size="13" text-anchor="start" font-weight="normal" fill="#1f2328">7: comparar com o esperado</text>
+<text x="40.0" y="245.0" font-size="13" text-anchor="start" font-weight="normal" fill="#1f2328">e exibir o resultado</text>
+<rect x="120.0" y="142.0" width="240" height="56" fill="#e8f1fb" stroke="#1f2328" stroke-width="1.6"/>
+<text x="240.0" y="175.2" font-size="15" text-anchor="middle" font-weight="bold" fill="#1f2328" text-decoration="underline">main : Roletas</text>
+<rect x="786.0" y="154.0" width="260" height="64" fill="#e8f1fb" stroke="#1f2328" stroke-width="1.4"/>
+<rect x="778.0" y="146.0" width="260" height="64" fill="#e8f1fb" stroke="#1f2328" stroke-width="1.4"/>
+<rect x="770.0" y="138.0" width="260" height="64" fill="#e8f1fb" stroke="#1f2328" stroke-width="1.6"/>
+<line x1="777.0" y1="138.0" x2="777.0" y2="202.0" stroke="#1f2328" stroke-width="1.4"/>
+<line x1="1023.0" y1="138.0" x2="1023.0" y2="202.0" stroke="#1f2328" stroke-width="1.4"/>
+<text x="900.0" y="164.2" font-size="12" text-anchor="middle" font-weight="normal" fill="#57606a" font-style="italic">«thread»</text>
+<text x="900.0" y="184.2" font-size="15" text-anchor="middle" font-weight="bold" fill="#1f2328" text-decoration="underline">rₖ : Roleta</text>
+<text x="908.0" y="116.5" font-size="13" text-anchor="middle" font-weight="normal" fill="#57606a" font-style="italic">k = 1..N  (qualquer quantidade de roletas)</text>
+<rect x="420.0" y="470.0" width="300" height="60" fill="#e8f1fb" stroke="#1f2328" stroke-width="1.6"/>
+<text x="570.0" y="505.2" font-size="15" text-anchor="middle" font-weight="bold" fill="#1f2328" text-decoration="underline">contador : ContadorCentral</text>
+<text x="570.0" y="550.5" font-size="13" text-anchor="middle" font-weight="normal" fill="#57606a">numPessoas : int</text>
+<path d="M760,440 L1136,440 L1150,454 L1150,544 L760,544 Z" fill="#fff9c4" stroke="#1f2328" stroke-width="1.3"/>
+<path d="M1136,440 L1136,454 L1150,454" fill="none" stroke="#1f2328" stroke-width="1.3"/>
+<text x="772.0" y="471.2" font-size="13" text-anchor="start" font-weight="normal" fill="#1f2328">Todas as N roletas chamam somar() ao</text>
+<text x="772.0" y="488.1" font-size="13" text-anchor="start" font-weight="normal" fill="#1f2328">mesmo tempo. Como o método é</text>
+<text x="772.0" y="505.0" font-size="13" text-anchor="start" font-weight="normal" fill="#1f2328">synchronized (monitor), só uma por vez</text>
+<text x="772.0" y="521.9" font-size="13" text-anchor="start" font-weight="normal" fill="#1f2328">altera numPessoas: nenhuma soma se perde.</text>
+<polyline points="760.0,495.0 720.0,500.0" fill="none" stroke="#57606a" stroke-width="1.2" stroke-dasharray="7 5" stroke-linejoin="round"/>
+<path d="M40,610 L1136,610 L1150,624 L1150,700 L40,700 Z" fill="#fff9c4" stroke="#1f2328" stroke-width="1.3"/>
+<path d="M1136,610 L1136,624 L1150,624" fill="none" stroke="#1f2328" stroke-width="1.3"/>
+<text x="52.0" y="642.6" font-size="13" text-anchor="start" font-weight="normal" fill="#1f2328">Esperado = Σ (k × giros), k = 1..N.   A roleta rₖ soma incr = k a cada giro.</text>
+<text x="52.0" y="659.5" font-size="13" text-anchor="start" font-weight="normal" fill="#1f2328">3.x = mensagens enviadas pela thread rₖ depois de 3: start()  ·  *[...] = repetição</text>
+<text x="52.0" y="676.4" font-size="13" text-anchor="start" font-weight="normal" fill="#1f2328">Ao final, main compara: Σ totPessoas (local de cada roleta) = numPessoas (central) = esperado.</text>
+</svg>
