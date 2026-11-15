@@ -1,295 +1,457 @@
 package Exercicio01;
 
+import java.util.Arrays;
 import java.util.Random;
 
+/**
+ * Uma rodada global permite que cada cliente decida uma vez entre pedir e pular.
+ * Cada garcom atende os interessados em lotes de, no maximo, C pedidos.
+ * Uma rodada pode ter varios lotes. As filas guardam solicitacoes aguardando;
+ * o garcom so assume outro lote depois de entregar completamente o anterior.
+ *
+ * Uso: java Exercicio01.Bar [clientes garcons capacidade rodadas]
+ */
 public class Bar {
 
-    static int garconsAtivos;
-
-    static synchronized void garcomTerminou() {
-        garconsAtivos--;
-        if (garconsAtivos == 0) {
-            Log.msg("BAR FECHADO");
-        }
-    }
-
     static class Log {
-        private static final long inicio = System.currentTimeMillis();
+        private static final long INICIO = System.currentTimeMillis();
 
         static synchronized void msg(String texto) {
-            long t = System.currentTimeMillis() - inicio;
-            System.out.printf("[%5d ms] %s%n", t, texto);
+            System.out.printf("[%5d ms] %s%n", System.currentTimeMillis() - INICIO, texto);
         }
     }
 
-    // um pedido feito por um cliente
     static class Pedido {
         final int clienteId;
-        boolean entregue = false;
+        final int garcomId;
+        final int rodada;
+        // Estes campos sao acessados somente sob o monitor de MonitorBar.
+        boolean emAtendimento;
+        boolean entregue;
 
-        Pedido(int clienteId) {
+        Pedido(int clienteId, int garcomId, int rodada) {
             this.clienteId = clienteId;
+            this.garcomId = garcomId;
+            this.rodada = rodada;
         }
     }
 
-    // Bartender só atende um garçom por vez
+    /** Um unico objeto compartilhado: somente um preparo ocorre por vez. */
     static class Bartender {
-        public synchronized void prepararPedidos(int garcomId, int qtd) {
-            Log.msg("  >> BARTENDER recebeu " + qtd + " pedido(s) do Garçom " + garcomId
-                    + " e está preparando..");
-            try {
-                Thread.sleep(400L * qtd);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+        public synchronized void prepararPedidos(int garcomId, int rodada, int quantidade)
+                throws InterruptedException {
+            if (Thread.currentThread().isInterrupted()) {
+                throw new InterruptedException();
             }
-            Log.msg("  >> BARTENDER terminou os pedidos do Garçom " + garcomId);
+            Log.msg("BARTENDER: rodada " + rodada + ", preparando " + quantidade
+                    + " pedido(s) do Garcom " + garcomId);
+            Thread.sleep(400L * quantidade);
+            Log.msg("BARTENDER: pedidos do Garcom " + garcomId + " prontos.");
         }
     }
 
-    // THREAD do garçom que monitora a fila de pedidos
-    static class Garcom implements Runnable {
-        private final int id;
+    /**
+     * Monitor unico para estado das rodadas, filas, decisoes e entregas.
+     * Nao ha sleep, preparo ou consumo dentro de seus metodos sincronizados.
+     */
+    static class MonitorBar {
+        private final int clientes;
+        private final int garcons;
         private final int capacidade;
-        private final int totalClientes;
         private final int rodadasTotal;
-        private final Bartender bartender;
+        private final int[] clientesPorGarcom;
+        private final Pedido[][] filas;
+        private final int[] inicio;
+        private final int[] tamanho;
+        private final int[] decisoesPendentes;
+        private final int[] entregasPendentes;
+        private final int[] ultimaDecisao;
+        private final boolean[] atendendo;
+        private final boolean[] concluiuRodada;
+        private int rodadaAtual = 1;
+        private int garconsConcluidos;
+        private boolean encerrado;
+        private boolean cancelado;
+        private Thread[] participantes = new Thread[0];
 
-        private final Pedido[] fila;
-        private int tamanho = 0;
-        private boolean atendendo = false;
-        private boolean encerrado = false;
-        private int proximaSenha = 0;
-        private int senhaDaVez = 0;
-        private int rodada = 0;
-
-        Garcom(int id, int capacidade, int totalClientes, int rodadasTotal, Bartender bartender) {
-            this.id = id;
+        MonitorBar(int clientes, int garcons, int capacidade, int rodadas) {
+            if (clientes < 1 || garcons < 1 || capacidade < 1 || rodadas < 1) {
+                throw new IllegalArgumentException("Todos os parametros devem ser >= 1.");
+            }
+            this.clientes = clientes;
+            this.garcons = garcons;
             this.capacidade = capacidade;
-            this.totalClientes = totalClientes;
-            this.rodadasTotal = rodadasTotal;
-            this.bartender = bartender;
-            this.fila = new Pedido[capacidade];
+            this.rodadasTotal = rodadas;
+            clientesPorGarcom = new int[garcons];
+            for (int c = 0; c < clientes; c++) {
+                clientesPorGarcom[c % garcons]++;
+            }
+            filas = new Pedido[garcons][];
+            for (int g = 0; g < garcons; g++) {
+                // Uma solicitacao por cliente por rodada; lote tem limite separado C.
+                filas[g] = new Pedido[clientesPorGarcom[g]];
+            }
+            inicio = new int[garcons];
+            tamanho = new int[garcons];
+            decisoesPendentes = new int[garcons];
+            entregasPendentes = new int[garcons];
+            ultimaDecisao = new int[clientes + 1];
+            atendendo = new boolean[garcons];
+            concluiuRodada = new boolean[garcons];
+            prepararRodada();
         }
 
-        // métodos dos CLIENTES
-        public synchronized boolean fazPedido(Pedido p) {
-            int minhaSenha = proximaSenha++;
-            Log.msg("Cliente " + p.clienteId + " quer pedir ao Garçom " + id + " (senha " + minhaSenha + ")");
-            while (!encerrado && (minhaSenha != senhaDaVez || atendendo || tamanho >= capacidade)) {
-                try {
-                    wait();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    return false;
-                }
+        private void prepararRodada() {
+            // Chamado no construtor ou mantendo este monitor; publica tudo de uma vez.
+            System.arraycopy(clientesPorGarcom, 0, decisoesPendentes, 0, garcons);
+            Arrays.fill(inicio, 0);
+            Arrays.fill(concluiuRodada, false);
+            garconsConcluidos = 0;
+            Log.msg("=== RODADA GLOBAL " + rodadaAtual + "/" + rodadasTotal + " ===");
+        }
+
+        synchronized void registrarThreads(Thread[] threads) {
+            // A main registra todas antes de iniciar qualquer uma.
+            participantes = threads.clone();
+        }
+
+        synchronized int aguardarRodada(int anterior) throws InterruptedException {
+            while (!encerrado && rodadaAtual <= anterior) {
+                wait();
+            }
+            return encerrado ? -1 : rodadaAtual;
+        }
+
+        synchronized Pedido registrarDecisao(int clienteId, int rodada, boolean querPedir) {
+            if (clienteId < 1 || clienteId > clientes) {
+                throw new IllegalArgumentException("ID de cliente invalido.");
             }
             if (encerrado) {
+                return null;
+            }
+            if (rodada != rodadaAtual || ultimaDecisao[clienteId] == rodada) {
+                throw new IllegalStateException("Cada cliente decide uma vez na rodada atual.");
+            }
+            int g = (clienteId - 1) % garcons;
+            ultimaDecisao[clienteId] = rodada;
+            decisoesPendentes[g]--;
+            Pedido pedido = null;
+            if (querPedir) {
+                pedido = new Pedido(clienteId, g + 1, rodada);
+                int posicao = (inicio[g] + tamanho[g]) % filas[g].length;
+                filas[g][posicao] = pedido;
+                tamanho[g]++;
+                Log.msg("Cliente " + clienteId + " solicitou pedido na rodada " + rodada
+                        + "; fila de espera do Garcom " + (g + 1) + ", posicao " + tamanho[g]);
+            } else {
+                Log.msg("Cliente " + clienteId + " decidiu PULAR a rodada " + rodada);
+            }
+            notifyAll();
+            return pedido;
+        }
+
+        synchronized Pedido[] recebeMaximoPedidos(int garcomId, int rodada)
+                throws InterruptedException {
+            int g = indiceGarcom(garcomId);
+            // Ainda pode chegar algum pedido? Aguarda C; depois da ultima decisao,
+            // libera tambem um lote parcial, ou retorna null se nao houver pedidos.
+            while (!encerrado && tamanho[g] < capacidade && decisoesPendentes[g] > 0) {
+                wait();
+            }
+            if (encerrado) {
+                return null;
+            }
+            if (rodada != rodadaAtual || atendendo[g] || concluiuRodada[g]) {
+                throw new IllegalStateException("Estado invalido para iniciar um lote.");
+            }
+            if (tamanho[g] == 0) {
+                return null;
+            }
+            int quantidade = Math.min(capacidade, tamanho[g]);
+            Pedido[] lote = new Pedido[quantidade];
+            StringBuilder ordem = new StringBuilder();
+            for (int i = 0; i < quantidade; i++) {
+                Pedido p = filas[g][inicio[g]];
+                filas[g][inicio[g]] = null;
+                inicio[g] = (inicio[g] + 1) % filas[g].length;
+                tamanho[g]--;
+                p.emAtendimento = true;
+                lote[i] = p;
+                if (i > 0) {
+                    ordem.append(", ");
+                }
+                ordem.append("C").append(p.clienteId);
+            }
+            atendendo[g] = true;
+            entregasPendentes[g] = quantidade;
+            Log.msg("Garcom " + garcomId + " assumiu lote de " + quantidade + "/"
+                    + capacidade + " na rodada " + rodada + "; ordem FIFO: " + ordem);
+            return lote;
+        }
+
+        synchronized boolean entregarPedido(Pedido pedido) {
+            if (cancelado) {
                 return false;
             }
-            fila[tamanho] = p;
-            tamanho++;
-            senhaDaVez++;
-            Log.msg("Cliente " + p.clienteId + " ENTROU na fila do Garçom " + id
-                    + " na posição " + tamanho + "/" + capacidade);
+            if (!pedido.emAtendimento || pedido.entregue) {
+                throw new IllegalStateException("Pedido nao esta aguardando entrega no lote.");
+            }
+            pedido.entregue = true;
+            pedido.emAtendimento = false;
+            entregasPendentes[pedido.garcomId - 1]--;
+            Log.msg("Garcom " + pedido.garcomId + " ENTREGOU ao Cliente " + pedido.clienteId
+                    + " (rodada " + pedido.rodada + ")");
             notifyAll();
             return true;
         }
 
-        public synchronized void esperaPedido(Pedido p) {
-            while (!p.entregue) {
-                try {
-                    wait();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    return;
-                }
-            }
-        }
-
-        public synchronized boolean isEncerrado() {
-            return encerrado;
-        }
-
-        // chamados pelo GARÇOM
-        private synchronized Pedido[] recebeMaximoPedidos(int alvo) {
-            Log.msg("Garçom " + id + " aguardando pedidos (0/" + alvo + ")");
-            while (tamanho < alvo) {
-                try {
-                    wait();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            }
-            atendendo = true;
-            Pedido[] lote = new Pedido[tamanho];
-            for (int i = 0; i < tamanho; i++) {
-                lote[i] = fila[i];
-            }
-            tamanho = 0;
-            return lote;
-        }
-
-        private void registraPedidos(Pedido[] lote) {
-            String ordem = "";
-            for (int i = 0; i < lote.length; i++) {
-                ordem = ordem + "C" + lote[i].clienteId + " ";
-            }
-            Log.msg("Garçom " + id + " recebeu " + lote.length + " pedidos, ordem de chegada: "
-                    + ordem.trim() + " -> indo à COPA");
-            bartender.prepararPedidos(id, lote.length);
-        }
-
-        private void entregaPedidos(Pedido[] lote, boolean ultimaRodada) {
-            for (int i = 0; i < lote.length; i++) {
-                Log.msg("Garçom " + id + " entregando pedido ao Cliente " + lote[i].clienteId);
-                try {
-                    Thread.sleep(150);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-                synchronized (this) {
-                    lote[i].entregue = true;
-                    notifyAll();
-                }
-            }
-            synchronized (this) {
-                atendendo = false;
-                if (ultimaRodada) {
-                    encerrado = true;
-                }
-                notifyAll();
-            }
-            Log.msg("Garçom " + id + " LIBERADO para novos pedidos");
-        }
-
-        @Override
-        public void run() {
-            if (totalClientes == 0) {
-                Log.msg("Garçom " + id + " não tem clientes atribuídos.");
-                terminar();
+        synchronized void finalizarLote(int garcomId) {
+            int g = indiceGarcom(garcomId);
+            if (cancelado) {
                 return;
             }
-            int alvo = capacidade;
-            if (totalClientes < capacidade) {
-                alvo = totalClientes;
+            if (!atendendo[g] || entregasPendentes[g] != 0) {
+                throw new IllegalStateException("O lote precisa ser totalmente entregue.");
             }
-            while (rodada < rodadasTotal) {
-                Log.msg("Garçom " + id + " - RODADA " + (rodada + 1) + "/" + rodadasTotal);
-                Pedido[] lote = recebeMaximoPedidos(alvo);
-                registraPedidos(lote);
-                rodada++;
-                entregaPedidos(lote, rodada == rodadasTotal);
-            }
-            terminar();
+            atendendo[g] = false;
+            Log.msg("Garcom " + garcomId + " concluiu todas as entregas do lote.");
+            notifyAll();
         }
 
-        private void terminar() {
-            synchronized (this) {
-                encerrado = true;
+        synchronized boolean esperaPedido(Pedido pedido) throws InterruptedException {
+            while (!pedido.entregue && !cancelado) {
+                wait();
+            }
+            // Cancelar nunca transforma um pedido pendente em entregue.
+            return pedido.entregue;
+        }
+
+        synchronized void concluirRodada(int garcomId, int rodada) {
+            int g = indiceGarcom(garcomId);
+            if (encerrado) {
+                return;
+            }
+            if (rodada != rodadaAtual || concluiuRodada[g] || atendendo[g]
+                    || tamanho[g] != 0 || decisoesPendentes[g] != 0) {
+                throw new IllegalStateException("Ainda existem decisoes ou pedidos nesta rodada.");
+            }
+            concluiuRodada[g] = true;
+            garconsConcluidos++;
+            Log.msg("Garcom " + garcomId + " concluiu a rodada " + rodada);
+            if (garconsConcluidos == garcons) {
+                if (rodadaAtual == rodadasTotal) {
+                    encerrado = true;
+                    Log.msg("BAR FECHADO: todas as rodadas e entregas foram concluidas.");
+                } else {
+                    rodadaAtual++;
+                    prepararRodada();
+                }
                 notifyAll();
             }
-            Log.msg("Garçom " + id + " encerrou o expediente.");
-            garcomTerminou();
+        }
+
+        synchronized boolean isCancelado() {
+            return cancelado;
+        }
+
+        void cancelar(String motivo) {
+            Thread[] threads;
+            synchronized (this) {
+                if (cancelado) {
+                    return;
+                }
+                cancelado = true;
+                encerrado = true;
+                threads = participantes.clone();
+                Log.msg("BAR CANCELADO: " + motivo);
+                notifyAll();
+            }
+            // Interrompe tambem quem esta dormindo no preparo, na entrega ou consumo.
+            // Executado fora deste monitor para nao criar inversao de locks.
+            for (Thread t : threads) {
+                if (t != Thread.currentThread()) {
+                    t.interrupt();
+                }
+            }
+        }
+
+        private int indiceGarcom(int id) {
+            if (id < 1 || id > garcons) {
+                throw new IllegalArgumentException("ID de garcom invalido.");
+            }
+            return id - 1;
         }
     }
 
-    // Cliente
-    static class Cliente implements Runnable {
+    static class Garcom implements Runnable {
         private final int id;
-        private final Garcom garcom;
-        private final Random random = new Random();
+        private final MonitorBar bar;
+        private final Bartender bartender;
 
-        Cliente(int id, Garcom garcom) {
+        Garcom(int id, MonitorBar bar, Bartender bartender) {
             this.id = id;
-            this.garcom = garcom;
+            this.bar = bar;
+            this.bartender = bartender;
+        }
+
+        private void registraPedidos(Pedido[] lote) throws InterruptedException {
+            Log.msg("Garcom " + id + " indo a COPA (rodada " + lote[0].rodada + ")");
+            bartender.prepararPedidos(id, lote[0].rodada, lote.length);
+        }
+
+        private boolean entregaPedidos(Pedido[] lote) throws InterruptedException {
+            for (Pedido p : lote) {
+                Thread.sleep(150);
+                if (!bar.entregarPedido(p)) {
+                    return false;
+                }
+            }
+            bar.finalizarLote(id);
+            return !bar.isCancelado();
         }
 
         @Override
         public void run() {
-            while (!garcom.isEncerrado()) {
-                if (random.nextInt(100) < 70) {
-                    Pedido p = new Pedido(id);
-                    if (!fazPedido(p)) {
-                        break;
-                    }
-                    garcom.esperaPedido(p);
-                    recebePedido();
-                    consomePedido();
-                } else {
-                    Log.msg("Cliente " + id + " NÃO quer pedir agora");
-                    dormir(300 + random.nextInt(500));
-                }
-            }
-            Log.msg("Cliente " + id + " foi embora");
-        }
-
-        private boolean fazPedido(Pedido p) {
-            return garcom.fazPedido(p);
-        }
-
-        private void recebePedido() {
-            Log.msg("Cliente " + id + " RECEBEU o pedido");
-        }
-
-        private void consomePedido() {
-            int tempo = 500 + random.nextInt(1500);
-            Log.msg("Cliente " + id + " consumindo por " + tempo + " ms");
-            dormir(tempo);
-        }
-
-        private void dormir(long ms) {
+            int anterior = 0;
             try {
-                Thread.sleep(ms);
+                int rodada;
+                while ((rodada = bar.aguardarRodada(anterior)) != -1) {
+                    anterior = rodada;
+                    Pedido[] lote;
+                    while ((lote = bar.recebeMaximoPedidos(id, rodada)) != null) {
+                        if (bar.isCancelado()) {
+                            return;
+                        }
+                        registraPedidos(lote);
+                        if (!entregaPedidos(lote)) {
+                            return;
+                        }
+                    }
+                    bar.concluirRodada(id, rodada);
+                }
             } catch (InterruptedException e) {
+                bar.cancelar("Garcom " + id + " interrompido.");
                 Thread.currentThread().interrupt();
+            } finally {
+                Log.msg("Garcom " + id + " encerrou o expediente.");
             }
         }
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        int clientes = 8, garcons = 2, capacidade = 3, rodadas = 3;
-        if (args.length >= 4) {
-            clientes = Integer.parseInt(args[0]);
-            garcons = Integer.parseInt(args[1]);
-            capacidade = Integer.parseInt(args[2]);
-            rodadas = Integer.parseInt(args[3]);
+    static class Cliente implements Runnable {
+        private final int id;
+        private final MonitorBar bar;
+        private final Random random = new Random();
+
+        Cliente(int id, MonitorBar bar) {
+            this.id = id;
+            this.bar = bar;
         }
-        if (clientes < 1 || garcons < 1 || capacidade < 1 || rodadas < 1) {
-            System.out.println("Todos os parâmetros devem ser >= 1");
+
+        private void recebePedido(int rodada) {
+            Log.msg("Cliente " + id + " RECEBEU seu pedido da rodada " + rodada);
+        }
+
+        private void consomePedido() throws InterruptedException {
+            int tempo = 500 + random.nextInt(1500);
+            Log.msg("Cliente " + id + " consumindo por " + tempo + " ms");
+            Thread.sleep(tempo);
+        }
+
+        @Override
+        public void run() {
+            int anterior = 0;
+            try {
+                int rodada;
+                while ((rodada = bar.aguardarRodada(anterior)) != -1) {
+                    anterior = rodada;
+                    // Sorteio unico por rodada: quem pula nao tenta de novo nela.
+                    Pedido pedido = bar.registrarDecisao(id, rodada, random.nextInt(100) < 70);
+                    if (pedido != null) {
+                        if (!bar.esperaPedido(pedido) || bar.isCancelado()) {
+                            break;
+                        }
+                        recebePedido(rodada);
+                        consomePedido();
+                    }
+                }
+            } catch (InterruptedException e) {
+                bar.cancelar("Cliente " + id + " interrompido.");
+                Thread.currentThread().interrupt();
+            } finally {
+                Log.msg("Cliente " + id + " foi embora.");
+            }
+        }
+    }
+
+    private static int[] lerParametros(String[] args) {
+        if (args.length != 0 && args.length != 4) {
+            throw new IllegalArgumentException("Informe nenhum argumento ou exatamente quatro.");
+        }
+        int[] valores = {8, 2, 3, 3};
+        if (args.length == 4) {
+            try {
+                for (int i = 0; i < 4; i++) {
+                    valores[i] = Integer.parseInt(args[i]);
+                }
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Os quatro parametros devem ser inteiros validos.");
+            }
+        }
+        for (int valor : valores) {
+            if (valor < 1) {
+                throw new IllegalArgumentException("Todos os parametros devem ser >= 1.");
+            }
+        }
+        return valores;
+    }
+
+    public static void main(String[] args) {
+        int[] p;
+        try {
+            p = lerParametros(args);
+        } catch (IllegalArgumentException e) {
+            System.err.println("Erro: " + e.getMessage());
+            System.err.println("Uso: java Exercicio01.Bar [clientes garcons capacidade rodadas]");
             return;
         }
-
-        System.out.printf("BAR ABERTO: %d clientes, %d garçons, capacidade %d, %d rodadas%n%n",
+        int clientes = p[0], garcons = p[1], capacidade = p[2], rodadas = p[3];
+        System.out.printf("BAR ABERTO: %d clientes, %d garcons, capacidade %d, %d rodadas globais%n",
                 clientes, garcons, capacidade, rodadas);
-
+        MonitorBar bar = new MonitorBar(clientes, garcons, capacidade, rodadas);
         Bartender bartender = new Bartender();
-        garconsAtivos = garcons;
-
-        int[] qtdPorGarcom = new int[garcons];
-        for (int i = 0; i < clientes; i++) {
-            qtdPorGarcom[i % garcons]++;
-        }
-
-        Garcom[] listaGarcons = new Garcom[garcons];
         Thread[] threads = new Thread[garcons + clientes];
-        int t = 0;
         for (int g = 0; g < garcons; g++) {
-            listaGarcons[g] = new Garcom(g + 1, capacidade, qtdPorGarcom[g], rodadas, bartender);
-            threads[t] = new Thread(listaGarcons[g], "Garçom " + (g + 1));
-            t++;
+            threads[g] = new Thread(new Garcom(g + 1, bar, bartender), "Garcom " + (g + 1));
         }
         for (int c = 0; c < clientes; c++) {
-            threads[t] = new Thread(new Cliente(c + 1, listaGarcons[c % garcons]), "Cliente " + (c + 1));
-            t++;
-            Log.msg("Cliente " + (c + 1) + " será atendido pelo Garçom " + ((c % garcons) + 1));
+            threads[garcons + c] = new Thread(new Cliente(c + 1, bar), "Cliente " + (c + 1));
+            Log.msg("Cliente " + (c + 1) + " vinculado ao Garcom " + ((c % garcons) + 1));
         }
-
-        for (int i = 0; i < threads.length; i++) {
-            threads[i].start();
+        bar.registrarThreads(threads);
+        for (Thread t : threads) {
+            t.setUncaughtExceptionHandler((thread, erro) -> {
+                bar.cancelar("Falha na thread " + thread.getName() + ": " + erro);
+                erro.printStackTrace();
+            });
+            t.start();
         }
-        for (int i = 0; i < threads.length; i++) {
-            threads[i].join();
+        boolean interrompida = false;
+        for (Thread t : threads) {
+            boolean terminou = false;
+            while (!terminou) {
+                try {
+                    t.join();
+                    terminou = true;
+                } catch (InterruptedException e) {
+                    interrompida = true;
+                    bar.cancelar("Thread principal interrompida.");
+                }
+            }
         }
-        System.out.println("\nPrograma finalizado");
+        System.out.println(bar.isCancelado() ? "\nPrograma cancelado." : "\nPrograma finalizado.");
+        if (interrompida) {
+            Thread.currentThread().interrupt();
+        }
     }
 }
