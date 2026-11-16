@@ -1,5 +1,3 @@
-package Exercicio02;
-
 import java.util.Random;
 
 public class BarbeiroDorminhoco {
