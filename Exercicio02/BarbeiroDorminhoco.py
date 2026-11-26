@@ -88,7 +88,7 @@ class Barbeiro(Thread):
             if id < 0:
                 break
             log(f"Barbeiro CORTANDO o cabelo do Cliente {id}...")
-            time.sleep(1)  # Corte fora do monitor: outros clientes podem chegar.
+            time.sleep(4)  # Corte fora do monitor: outros clientes podem chegar.
             self.barbearia.terminar_corte(id)
         log("Barbeiro foi para casa.")
 
@@ -111,7 +111,7 @@ def main(argumentos=None):
         print("Uso: python3 barbeiro_dorminhoco.py <clientes> <cadeiras>")
         return 1
     try:
-        clientes, cadeiras = map(int, argumentos) if argumentos else (10, 3)
+        clientes, cadeiras = map(int, argumentos) if argumentos else (6, 3)
     except ValueError:
         print("Os parâmetros devem ser números inteiros.")
         return 1

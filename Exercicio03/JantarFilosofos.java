@@ -1,5 +1,3 @@
-package Exercicio03;
-
 import java.util.Random;
 
 public class JantarFilosofos {

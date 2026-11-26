@@ -255,7 +255,7 @@ def main(argumentos=None):
         print("Uso: python3 bar.py <clientes> <garcons> <capacidade> <rodadas>")
         return 1
     try:
-        valores = list(map(int, argumentos)) if argumentos else [8, 2, 3, 3]
+        valores = list(map(int, argumentos)) if argumentos else [5, 2, 2, 1]
     except ValueError:
         print("Todos os parâmetros devem ser números inteiros.")
         return 1
